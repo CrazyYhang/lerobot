@@ -145,8 +145,6 @@ python lerobot/scripts/control_robot.py \
   --control.repo_id=${HF_USER}/${TASK_NAME} \
   --control.episode=25
 
-#学长写的代码，已废除
-  python test/ReConsolidate.py --dataset_repo_id ${HF_USER}/${TASK_NAME}
 
 
 
