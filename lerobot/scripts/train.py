@@ -136,6 +136,28 @@ def update_policy(
     return train_metrics, output_dict
 
 
+def apply_posthoc_dp(batch: dict) -> dict:
+    """
+    模拟后置DP处理：根据观察和目标状态，对原始动作进行轨迹优化。
+    模拟手眼标定影响后动作的调整。
+    """
+    # 示例：假设动作是一个 Nx4 的向量 [x, y, z, gripper]
+    obs = batch['obs']      # (N, obs_dim)
+    actions = batch['actions']  # (N, 4)
+    
+    # 模拟一个标定变换（比如固定旋转或仿射）
+    # 实际可用 pose 优化或轨迹插值算法
+    calibrated_actions = []
+    
+    for a in actions:
+        new_a = a.clone()
+        new_a[:3] = a[:3] + 0.02  # 模拟手眼坐标误差补偿
+        calibrated_actions.append(new_a)
+    
+    batch['actions'] = torch.stack(calibrated_actions)
+    return batch
+
+
 @parser.wrap()
 def train(cfg: TrainPipelineConfig):
     """
@@ -292,6 +314,9 @@ def train(cfg: TrainPipelineConfig):
         for key in batch:
             if isinstance(batch[key], torch.Tensor):
                 batch[key] = batch[key].to(device, non_blocking=True)
+
+        #DP后处理逻辑
+        batch = apply_posthoc_dp(batch) 
 
         # 更新策略模型的参数，并更新训练指标跟踪器
         train_tracker, output_dict = update_policy(
