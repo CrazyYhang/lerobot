@@ -31,7 +31,6 @@ from scipy.linalg import expm, logm
 from scipy.spatial.transform import Rotation
 
 
-# 定义全局变量用于存储手眼标定矩阵
 HAND_EYE_MATRIX = None
 
 def preprocess_observation(observations: dict[str, np.ndarray]) -> dict[str, Tensor]:
